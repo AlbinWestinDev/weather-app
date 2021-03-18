@@ -1,14 +1,12 @@
+//hämtar kompontneter samt css och ikoner
 import React from "react";
 import "./App.css";
 import Form from "./app_component/form.component";
 import Weather from "./app_component/weather.component";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-// git project https://github.com/erikflowers/weather-icons
 import "weather-icons/css/weather-icons.css";
-
+//min api nyckel för att komma åt openweather api
 const Api_Key = "429736441cf3572838aa10530929f7cd";
-
 class App extends React.Component {
   constructor() {
     super();
@@ -20,8 +18,9 @@ class App extends React.Component {
       celsius: undefined,
       temp_max: null,
       temp_min: null,
+      timezone: undefined,
       description: "",
-      error: false
+      error: false,
     };
 
     this.weatherIcon = {
@@ -31,7 +30,7 @@ class App extends React.Component {
       Snow: "wi-snow",
       Atmosphere: "wi-fog",
       Clear: "wi-day-sunny",
-      Clouds: "wi-day-fog"
+      Clouds: "wi-day-fog",
     };
   }
 
@@ -68,7 +67,7 @@ class App extends React.Component {
     return cell;
   }
 
-  getWeather = async e => {
+  getWeather = async (e) => {
     e.preventDefault();
 
     const country = e.target.elements.country.value;
@@ -89,16 +88,17 @@ class App extends React.Component {
         temp_max: this.calCelsius(response.main.temp_max),
         temp_min: this.calCelsius(response.main.temp_min),
         description: response.weather[0].description,
-        error: false
+        timezone: response.weather[0].timezone,
+        error: false,
       });
 
-      // seting icons
+      // ikoner
       this.get_WeatherIcon(this.weatherIcon, response.weather[0].id);
 
       console.log(response);
     } else {
       this.setState({
-        error: true
+        error: true,
       });
     }
   };
@@ -121,4 +121,3 @@ class App extends React.Component {
 }
 
 export default App;
-
