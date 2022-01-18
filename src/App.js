@@ -3,16 +3,18 @@ import React from "react";
 import "./App.css";
 import Form from "./app_component/form.component";
 import Weather from "./app_component/weather.component";
+import Forecast from "./app_component/forecast.component";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "weather-icons/css/weather-icons.css";
+
 //min api nyckel för att komma åt openweather api
-const Api_Key = "429736441cf3572838aa10530929f7cd";
+const Api_Key = "9e12aabdcf0f7546ef367642fbb2cabd";
+
 class App extends React.Component {
   constructor() {
     super();
     this.state = {
       city: undefined,
-      country: undefined,
       icon: undefined,
       main: undefined,
       celsius: undefined,
@@ -21,6 +23,9 @@ class App extends React.Component {
       timezone: undefined,
       description: "",
       error: false,
+      renderForecast: 0,
+      apikey: Api_Key,
+      cnt: undefined,
     };
 
     this.weatherIcon = {
@@ -66,16 +71,19 @@ class App extends React.Component {
     let cell = Math.floor(temp - 273.15);
     return cell;
   }
+  getWeek = async (e) => {
+    e.preventDefault();
+    console.log("kuken");
+  };
 
   getWeather = async (e) => {
     e.preventDefault();
 
-    const country = e.target.elements.country.value;
     const city = e.target.elements.city.value;
 
-    if (country && city) {
+    if (city) {
       const api_call = await fetch(
-        `http://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${Api_Key}`
+        `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${Api_Key}`
       );
 
       const response = await api_call.json();
@@ -88,7 +96,7 @@ class App extends React.Component {
         temp_max: this.calCelsius(response.main.temp_max),
         temp_min: this.calCelsius(response.main.temp_min),
         description: response.weather[0].description,
-        timezone: response.weather[0].timezone,
+
         error: false,
       });
 
@@ -102,8 +110,22 @@ class App extends React.Component {
       });
     }
   };
-
+  clickBtn = (e) => {
+    this.setState({
+      renderForecast: 1,
+    });
+  };
   render() {
+    let comp;
+    if (this.state.renderForecast == 1) {
+      comp = (
+        <Forecast
+          city={this.state.city}
+          apikey={this.state.apikey}
+          temprature={this.state.temprature}
+        />
+      );
+    }
     return (
       <div className="App">
         <Form loadweather={this.getWeather} error={this.state.error} />
@@ -115,6 +137,11 @@ class App extends React.Component {
           temp_min={this.state.temp_min}
           description={this.state.description}
         />
+        <button className="btn btn-primary" onClick={this.clickBtn}>
+          Get Forecast
+        </button>
+
+        {comp}
       </div>
     );
   }
